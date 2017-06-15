@@ -16,14 +16,7 @@
               <a href="" @click.prevent='changeTab(index + 1, $event)'>
                 <div class="day__name">{{day.dayName}}</div>
                 <div class="day__icon">
-                  <i class="wi"
-                    :class="{
-                      'wi-day-sunny': (day.cloudySky < day.clearSky) && !day.isRain && !day.isSnow && !day.isStorm,
-                      'wi-day-rain': day.isRain,
-                      'wi-day-lightning': day.isStorm,
-                      'wi-day-snow': day.isSnow,
-                      'wi-day-cloudy': ((day.cloudySky >= day.clearSky) && !day.isRain && !day.isSnow && !day.isStorm)
-                    }"></i>
+                  <i class="wi" :class="day.condition.icon"></i>
                 </div>
                 <div class="day__temp-range">{{day.minT}}<sup>o</sup>/{{day.maxT}}<sup>o</sup></div>
               </a>
@@ -42,36 +35,36 @@
               <span>{{day.maxT}}<sup>o</sup></span>
             </div>
             <div class="day-icon">
-              <i class="wi"
-                :class="{
-                  'wi-day-sunny': (day.cloudySky < day.clearSky) && day.cloudySky < 3 && !day.isRain && !day.isSnow && !day.isStorm,
-                  'wi-day-rain': day.isRain,
-                  'wi-day-lightning': day.isStorm,
-                  'wi-day-snow': day.isSnow,
-                  'wi-day-cloudy': ((day.cloudySky >= day.clearSky) && !day.isRain && !day.isSnow && !day.isStorm)
-                }">
-              </i>
+              <i class="wi" :class="day.condition.icon"></i>
             </div>
             <div class="desc">
-              Облачно
+              {{ day.condition.conditionNameRu}}
             </div>
           </div>
-          <div v-for="(time, j) in day.list" class="widget__time_wrap">
-            <div class="time">
-              {{ time.dt_txt.split(" ")[1].split(':').slice(0, 2).join(':') }}
+          <div class="table">
+            <div class="col">
+              <div class="row th">Время</div>
+              <div class="row th">Температура</div>
+              <div class="row th">Влажность</div>
+              <div class="row th">Ветер км/час</div>
+              <div class="row th">Состояние</div>
             </div>
-            <div class="temp">
-              Температура {{ time.main.temp }}<sup>o</sup>
-            </div>
-            <div class="humidity">
-              Влажность - {{ time.main.humidity }}%
-            </div>
-            <div class="wind">
-              Ветер  <i class="wi wi-wind" :style="{transform: 'rotate(' + time.wind.deg + 'deg)'}"></i>{{ time.wind.speed}} км/час
-            </div>
-            <div class="description">
-              {{ time.weather[0].description.slice(0, 1).toUpperCase() + time.weather[0].description.slice(1)}}
-              <i class="wi" :class='time.dt_txt.split(" ")[1].split(":")[0] > 3 && time.dt_txt.split(" ")[1].split(":")[0] < 19 ? iconsDay[time.weather[0].description] : iconsNight[time.weather[0].description]'></i>
+            <div v-for="(time, j) in day.list" class="col">
+              <div class="time row">
+                {{ time.dt_txt.split(" ")[1].split(':').slice(0, 2).join(':') }}
+              </div>
+              <div class="temp row">
+                {{ time.main.temp }}<sup>o</sup>
+              </div>
+              <div class="humidity row">
+                {{ time.main.humidity }}%
+              </div>
+              <div class="wind row"><i class="wi wi-wind" :style="{ transform: 'rotate(' + time.wind.deg + 'deg)'}"> </i>{{ time.wind.speed}}
+              </div>
+              <div class="description row">
+                {{ time.weather[0].description.slice(0, 1).toUpperCase() + time.weather[0].description.slice(1)}}
+                <i class="wi" :class='time.dt_txt.split(" ")[1].split(":")[0] > 3 && time.dt_txt.split(" ")[1].split(":")[0] < 19 ? iconsDay[time.weather[0].description] : iconsNight[time.weather[0].description]'></i>
+              </div>
             </div>
           </div>
          </div>
@@ -107,21 +100,21 @@ export default {
       },
       iconsDay: {
         'ясно':'wi-day-sunny',
-        'пасмурно': 'wi-cloudy',
-        'легкий дождь': 'wi-sprinkle',
+        'пасмурно': 'cloudy',
+        'легкий дождь': 'wi-day-showers',
         'слегка облачно': 'wi-day-cloudy',
-        'дождь': 'wi-rain',
-        'облачно': 'wi-cloudy',
-        'снег': '.wi-day-snow',
-        'молния': '.wi-day-thunderstorm'
+        'дождь': 'wi-day-rain',
+        'облачно': ' cloudy',
+        'снег': 'wi-day-snow',
+        'молния': 'wi-day-sleet-storm'
       },
       iconsNight: {
         'ясно':'wi-night-clear',
-        'пасмурно': 'wi-cloudy',
-        'легкий дождь': 'wi-night-showers',
+        'пасмурно': 'cloudy',
+        'легкий дождь': 'wi-night-alt-sprinkle',
         'слегка облачно': 'wi-night-alt-cloudy',
-        'дождь': 'wi-night-rain',
-        'облачно': 'wi-cloudy',
+        'дождь': 'wi-night-alt-rain',
+        'облачно': 'cloudy',
         'снег': 'wi-night-alt-snow',
         'молния': 'wi-night-alt-lightning'
       }
@@ -135,6 +128,9 @@ export default {
     },
     loaded() {
       this.loadingMap = false;
+    },
+    enter() {
+      console.log(1);
     }
   },
   components: {mapLoader}
@@ -188,7 +184,7 @@ export default {
     float: left;
     background: rgba(255, 255, 255, .35);
     height: 190px;
-    width: 110px;
+    width: 18%;
     margin-left: 5px;
   }
   .widget__menu li:first-child {
@@ -210,14 +206,14 @@ export default {
     margin: 10px 0;
   }
   .widget__menu .day__name {
-    color: #00BFFF;
+    color: #fff;
     font-size: 20px;
   }
   .widget__menu .day__icon i {
-    color: #8B008B;
+    color: #00BFFF;
   }
   .widget__menu .day__temp-range {
-    color: #8B008B;
+    color: #fff;
     font-size: 14px;
   }
   .widget__hoverEffect {
@@ -250,29 +246,34 @@ export default {
     }
   }
   .total-description {
-    width: 33%;
-    height: 100px;
-    margin-top: 15px;
-    display: table;
-    clear: both;
+    width: 220px;
+    height: 80px;
+    margin: 15px 0 90px 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
   }
   .total-description > div {
-    float: left;
     height: 100%;
     color: #fff;
+    text-align: center;
   }
   .total-description .avg-temp {
     font-size: 60px;
-    width: 51%;
+    width: 33%;
   }
   .total-description .range-temp {
     font-size: 22px;
-    width: 20%;
+    width: 33%;
     color: #ccc;
   }
   .total-description .range-temp > span {
     display: block;
     margin-top: 10px;
+  }
+  .total-description .day-icon {
+    padding-top: 22px;
+    width: 33%;
   }
   .total-description .desc {
     font-size: 36px;
@@ -280,29 +281,56 @@ export default {
     text-align: center;
     color: #ccc;
   }
-  .total-description .day-icon {
-    padding-top: 22px;
-  }
-  .widget__time_wrap {
+  .table {
     width: 100%;
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
   }
-  .widget__time_wrap > div {
-    display: inline-block;
+  .table .col {
+    width: 11%;
+    text-align: center;
   }
-  .widget__time_wrap .time {
+  .table .row {
+    height: 45px;
+  }
+  .table .th {
+    font-size: 0.55em;
+    text-align: left;
+  }
+  .table .description {
+    font-size: 0.66em;
 
   }
-  .widget__time_wrap .temp {
-
+  .table .description i {
+    display: block;
   }
-  .widget__time_wrap .humidity {
-
+  .table .wind i {
+    margin-top: -12px;
   }
-  .widget__time_wrap .wind {
-
-  }
-  .description {
-
+  @media screen and (max-width: 980px) {
+    .widget {
+      width: 95%;
+      left: 2.5%;
+      margin-left: 0;
+    }
+    .widget__weather {
+      width: 100%;
+      float: none;
+    }
+    .widget__map {
+      width: 100%;
+      padding-left: 5px;
+      float: none;
+      margin: 15px 0;
+    }
+    .table {
+      width: 100%;
+    }
   }
   /*WeatherFont
 -----------------------------------------------------------------
@@ -313,6 +341,7 @@ export default {
     src: url('../assets/weatherFont/weathericons-regular-webfont.eot?#iefix') format('embedded-opentype'), url('../assets/weatherFont/weathericons-regular-webfont.woff2') format('woff2'), url('../assets/weatherFont/weathericons-regular-webfont.woff') format('woff'), url('../assets/weatherFont/weathericons-regular-webfont.ttf') format('truetype'), url('../assets/weatherFont/weathericons-regular-webfont.svg#weather_iconsregular') format('svg');
     font-weight: normal;
     font-style: normal;
+
   }
   .wi {
     display: inline-block;
@@ -323,7 +352,7 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: 2.5em;
-    color: #f2f2f2;
+    color: #00BFFF;
   }
 
 .wi-day-sunny:before {
@@ -332,26 +361,16 @@ export default {
 .wi-day-cloudy:before {
   content: "\f002";
 }
-.wi-sprinkle:before {
-  content: "\f01c";
-}
-.wi-day-lightning:before {
-  content: "\f005";
-}
+
 .wi-day-rain:before {
   content: "\f008";
 }
 .wi-day-snow:before {
   content: "\f00a";
 }
-.wi-day-thunderstorm:before {
-  content: "\f010";
-}
-.wi-cloudy:before {
+
+.cloudy:before {
   content: "\f013";
-}
-.wi-rain:before {
-  content: "\f019";
 }
 
 .wi-night-alt-snow:before {
@@ -363,23 +382,25 @@ export default {
 .wi-night-alt-cloudy:before {
   content: "\f086";
 }
-.wi-night-showers:before {
-  content: "\f037";
+.
+.wi-night-alt-lightning:before {
+  content: "\f025";
 }
-.wi-night-rain:before {
-  content: "\f036";
+.wi-day-showers:before {
+  content: "\f01a";
+}
+.wi-day-sleet-storm:before {
+  content: "\f068";
+}
+.wi-night-alt-sprinkle:before {
+  content: "\f02b";
+}
+.wi-night-alt-rain:before {
+  content: "\f028";
 }
 .wi-night-alt-lightning:before {
   content: "\f025";
 }
-
-.wi-celsius:before {
-  content: "\f03c";
-}
-
-
-
-
 .wi-wind:before {
   content: "\f0b1";
 }

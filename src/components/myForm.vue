@@ -83,14 +83,16 @@ export default {
 .form > a:active {background:  rgb(152,15,0);}
 .form > .form__placeholder {
   position: absolute;
-  top: 38%;
+  top: 33%;
   left: 1%;
   transition: all .5s ease;
   color: #999;
 }
 .form > .form__placeholder.active {
   top: -45%;
-  color: #000;
+  color: #fff;
+  transform-origin: 0 0;
+  transform: scale(0.7);
 }
 .form__placeholder.error {
   animation: emptyString .1s linear alternate;
@@ -104,6 +106,13 @@ export default {
   100% {
     transform: rotateZ(-2deg);
 
+  }
+}
+@media screen and (max-width: 980px) {
+  .form-wrap {
+  left: 2.5%;
+  width: 95%;
+  margin-left: 0;
   }
 }
 </style>
