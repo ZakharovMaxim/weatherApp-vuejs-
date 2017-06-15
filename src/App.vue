@@ -96,6 +96,7 @@ export default {
 
                     }
                   });
+                  
                   this.mapURL = `https://www.google.com/maps/embed/v1/place?key=AIzaSyCUFi97R3tGrOFSwrooJPWr1m0wDsZBm1U&q="${city}"`;
 
                   for(let i = 0; i < this.weather.length; i++) {
@@ -136,10 +137,10 @@ export default {
 
 <style scoped>
 #app {
-      font-family: 'Bubbler One', Helvetica, sans-serif;
+  font-family: 'Bubbler One', Helvetica, sans-serif;
   width: 100%;
-  min-height: 917px;
   height: 100vh;
+  min-height: 830px;
   background: url('./assets/bg4b.jpg') no-repeat;
   background-size: cover;
   background-attachment: fixed;

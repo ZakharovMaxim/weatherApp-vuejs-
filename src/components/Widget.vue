@@ -287,9 +287,8 @@ export default {
     display: -ms-flex;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
     font-size: 18px;
+    margin-bottom: 50px;
   }
   .table .col {
     width: 11%;
@@ -304,10 +303,14 @@ export default {
   }
   .table .description {
     font-size: 0.66em;
-
+    position: relative;
   }
   .table .description i {
     display: block;
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translate(-50%, 0);
   }
   .table .wind i {
     margin-top: -12px;
@@ -330,6 +333,19 @@ export default {
     }
     .table {
       width: 100%;
+    }
+  }
+  @media screen and (max-width: 640px) {
+    .table {
+      font-size: 14px;
+    }
+    .table .wind i {
+      font-size: 20px;
+      margin-right: 2px;
+      margin-top: 0;
+    }
+    .table .description i {
+      bottom: 0;
     }
   }
   /*WeatherFont
