@@ -35,6 +35,11 @@ export default {
         this.error = true;
         return false;
       }
+      if(this.searchStr == +this.searchStr) {
+        this.searchStr = '';
+        this.error = true;
+        return;
+      }
       this.$emit('pressed', this.searchStr);
     }
   }

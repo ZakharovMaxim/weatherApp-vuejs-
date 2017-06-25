@@ -2,13 +2,14 @@
   <div class="widget">
     <div v-if="status != 200">
       <div v-if="status == 404">
-        <img src="../assets/404.jpg" alt="" style="max-width: 100%">
+        404
       </div>
       <div v-if="status == 500">
         500
       </div>
     </div>
     <div v-else>
+      <div class="hoverElement" :style="{width: hoverElement.w + 'px', left: hoverElement.pos + 'px'}"></div>
       <div class="widget__weather">
         <div class="widget__menu">
           <ul>
@@ -95,7 +96,7 @@ export default {
       currentTab: 1,
       loadingMap: true,
       hoverElement: {
-        'el': document.querySelector('.widget__hoverEffect'),
+        'w': 0,
         'pos': 0
       },
       iconsDay: {
@@ -122,23 +123,31 @@ export default {
   },
   methods: {
     changeTab(n, event) {
+      document.querySelector(`.widget__menu li:nth-child(${this.currentTab})`).classList.remove('active');
       this.currentTab = n;
+      document.querySelector(`.widget__menu li:nth-child(${n})`).classList.add('active');
       let target = event.target.nodeName == "A" ? event.target.parentNode : event.target.parentNode.parentNode;
-      this.hoverElement.pos = target.getBoundingClientRect().left;
+      this.hoverElement.pos = target.getBoundingClientRect().left - document.querySelector('.widget__menu li:first-child').getBoundingClientRect().left;
+      this.hoverElement.w = target.getBoundingClientRect().width;
+
     },
     loaded() {
       this.loadingMap = false;
     },
-    enter() {
-      console.log(1);
+    resize(){
+      this.hoverElement.pos = document.querySelector(`.widget__menu li:nth-child(${this.currentTab})`).getBoundingClientRect().left - document.querySelector('.widget__menu li:first-child').getBoundingClientRect().left;
+      this.hoverElement.w = document.querySelector(`.widget__menu li:nth-child(${this.currentTab})`).getBoundingClientRect().width;
     }
   },
-  components: {mapLoader}
+  components: {mapLoader},
+  created() {
+    window.addEventListener('resize', this.resize);
+  }
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-@import url('https://fonts.googleapis.com/css?family=Bubbler+One');
+@import url('https://fonts.googleapis.com/css?family=Poiret+One&subset=cyrillic');
   .widget {
     width: 980px;
     height: 450px;
@@ -148,6 +157,7 @@ export default {
     margin-top: -225px;
     margin-left: -490px;
     animation: fade 1s ease-in-out;
+    font-family: 'Poiret One', Arial,cursive;
   }
   @keyframes fade {
     0% {
@@ -156,6 +166,14 @@ export default {
     100% {
       opacity: 1;
     }
+  }
+  .hoverElement {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 190px;width: 18%;
+    background: rgba(0,0,0,.5);
+    transition: all 1s cubic-bezier(0, 0.95, 0.64, 1.27);
   }
   .widget__weather {
     width: 60%;
@@ -178,7 +196,7 @@ export default {
   .widget__menu ul {
     list-style: none;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
   }
   .widget__menu li {
     float: left;
@@ -186,6 +204,9 @@ export default {
     height: 190px;
     width: 18%;
     margin-left: 5px;
+  }
+  .widget__menu li.active {
+    background: transparent;
   }
   .widget__menu li:first-child {
     margin-left: 0;
@@ -216,15 +237,6 @@ export default {
     color: #fff;
     font-size: 14px;
   }
-  .widget__hoverEffect {
-    width: 94px;
-    background: rgba(0, 0, 0, .15);
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 190px;
-    transition: all .5s cubic-bezier(0.4, 0, 0, 1.29);
-  }
   .widget__tabs {
     height: 91%;
   }
@@ -234,6 +246,8 @@ export default {
   .widget__tab.active {
     display: block;
     animation: fadeAndRoll 1s ease-in-out;
+    background: rgba(0,0,0,.5);
+    padding: 6px 3px;
   }
   @keyframes fadeAndRoll {
     0% {
@@ -246,7 +260,7 @@ export default {
     }
   }
   .total-description {
-    width: 220px;
+    width: 240px;
     height: 80px;
     margin: 15px 0 90px 0;
     display: flex;
@@ -260,12 +274,11 @@ export default {
   }
   .total-description .avg-temp {
     font-size: 60px;
-    width: 33%;
   }
   .total-description .range-temp {
     font-size: 22px;
-    width: 33%;
     color: #ccc;
+    margin: 0 10px;
   }
   .total-description .range-temp > span {
     display: block;
@@ -273,7 +286,7 @@ export default {
   }
   .total-description .day-icon {
     padding-top: 22px;
-    width: 33%;
+
   }
   .total-description .desc {
     font-size: 36px;
@@ -287,7 +300,7 @@ export default {
     display: -ms-flex;
     display: flex;
     flex-wrap: wrap;
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 50px;
   }
   .table .col {
@@ -298,24 +311,28 @@ export default {
     height: 45px;
   }
   .table .th {
-    font-size: 0.55em;
+    font-size: 0.65em;
     text-align: left;
   }
   .table .description {
-    font-size: 0.66em;
+    font-size: 0.9em;
     position: relative;
   }
   .table .description i {
     display: block;
     position: absolute;
-    bottom: -20px;
+    bottom: -41px;
     left: 50%;
     transform: translate(-50%, 0);
   }
   .table .wind i {
-    margin-top: -12px;
+    display: block;
+    margin-top: -23px;
   }
-  @media screen and (max-width: 980px) {
+  .table .wind {
+    margin-bottom: 23px;
+  }
+  @media screen and (max-width: 1008px) {
     .widget {
       width: 95%;
       left: 2.5%;
@@ -337,15 +354,22 @@ export default {
   }
   @media screen and (max-width: 640px) {
     .table {
-      font-size: 14px;
+      font-size: 10px;
     }
     .table .wind i {
       font-size: 20px;
-      margin-right: 2px;
-      margin-top: 0;
+    }
+    .table .th {
+      font-size: 0.9em;
     }
     .table .description i {
-      bottom: 0;
+      bottom: -12px;
+    }
+    .table .wind {
+      margin-bottom: 10px;
+    }
+    .table .wind i {
+      margin-top: -10px;
     }
   }
   /*WeatherFont
