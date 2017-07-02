@@ -1,12 +1,7 @@
 <template>
   <div class="widget">
     <div v-if="status != 200">
-      <div v-if="status == 404">
-        404
-      </div>
-      <div v-if="status == 500">
-        500
-      </div>
+      <h3>Ошибка :(</h3>
     </div>
     <div v-else>
       <div class="hoverElement" :style="{width: hoverElement.w + 'px', left: hoverElement.pos + 'px'}"></div>

@@ -31,14 +31,16 @@ export default {
       let currentDay = -1;
       this.$http.get(`/${city}`)
                 .then(function(response){
-                  console.log(response);
                   this.loading = false;
                   this.isActiveWidget = true;
                   this.weather = response.body;
                   this.status = 200;
                   this.mapURL = `https://www.google.com/maps/embed/v1/place?key=AIzaSyCUFi97R3tGrOFSwrooJPWr1m0wDsZBm1U&q="${city}"`;
                 }, function(error) {
-                  this.status = 500;
+                this.loading = false;
+                this.isActiveWidget = true;
+                console.log(error);
+                  this.status = error.status;
                 });
     }
   },
