@@ -1,21 +1,13 @@
 # weather
 
-> A Vue.js project
+> A Vue.js + MongoDB + express project
 
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
+1 cd ./server
 ```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+2 npm install
+```
+3 mongod --storageEngine=mmapv1 --dbpath ./db/data
+```
+4 npm start
+```
+>localhost:3000
