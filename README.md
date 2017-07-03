@@ -6,7 +6,7 @@
 ```
 2 npm install
 ```
-3 mongod --storageEngine=mmapv1 --dbpath ./db/data
+3 mongod --storageEngine=mmapv1 --dbpath ./mongodb/data
 ```
 4 npm start
 ```
