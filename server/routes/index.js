@@ -26,16 +26,16 @@ router.get('/:cityName', function(req, res, next) {
     var result = [];
     cursor = db.collection('weather').find({cityName: city}).nextObject(function(err, item) {
       if(item) {
-        if((new Date() - item.modified) >= 60*60*24*100) {
-          console.log('update in db');
+        if((new Date().getFullYear() != new Date(item.modified).getFullYear() || new Date().getMonth() != new Date(item.modified).getMonth() || new Date().getDate() != new Date(item.modified).getDate()) ) {
+          console.log('from api update db');
           getDataFromApi(db, true);
         } else {
-          item = JSON.parse(JSON.stringify(item));
           console.log('from db');
+          item = JSON.parse(JSON.stringify(item));
           res.send(item.data);
         }
       } else {
-        console.log('from api');
+        console.log('from api insert in db');
         getDataFromApi(db);
       }
     });
@@ -65,7 +65,7 @@ function getDataFromApi(db, update) {
         let desc = item.weather[0].description;
         if(!~find(weather, date)) {
           weatherForDay.date = date;
-          let dayName = new Date(date.split("-")[0], date.split("-")[1], date.split("-")[2] - 2).toLocaleString("ru", {weekday: 'short'});
+          let dayName = new Date(date).toLocaleString("ru", {weekday: 'short'});
           weatherForDay.dayName = dayName.slice(0, 1).toUpperCase() + dayName.slice(1);
           weatherForDay.minT = item.main.temp_min;
           weatherForDay.maxT = item.main.temp_max;
