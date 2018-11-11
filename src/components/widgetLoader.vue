@@ -9,9 +9,9 @@
   </div>
 </template>
 <script>
-  export default {
-      name: 'widgetLoader'
-  }
+export default {
+  name: 'widgetLoader'
+}
 </script>
 <style scoped>
 .loader {

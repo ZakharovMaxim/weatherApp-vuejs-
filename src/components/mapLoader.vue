@@ -1,10 +1,10 @@
 <template>
-  <div class="loader"></div>
+  <div class="loader" />
 </template>
 <script>
-  export default {
-      name: 'mapLoader'
-  }
+export default {
+  name: 'mapLoader'
+}
 </script>
 <style scoped>
 .loader {

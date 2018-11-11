@@ -1,29 +1,27 @@
 <template>
   <div class="widget">
-    <div v-if="status != 200">
-      <h3>Ошибка :(</h3>
-    </div>
+    <widget-loader v-if='loading' />
+    <div class="error" v-else-if='error'>{{error}}</div>
     <div v-else>
-      <div class="hoverElement" :style="{width: hoverElement.w + 'px', left: hoverElement.pos + 'px'}"></div>
       <div class="widget__weather">
         <div class="widget__menu">
           <ul>
-            <li v-for="(day, index) in weather" class="day">
+            <li v-for="(day, index) in weather" class="day" :key="index" :class="{'active': index === currentTab - 1}">
               <a href="" @click.prevent='changeTab(index + 1, $event)'>
-                <div class="day__name">{{day.dayName}}</div>
-                <div class="day__icon">
+                <span class="day__name">{{day.dayName}}</span>
+                <span class="day__icon">
                   <i class="wi" :class="day.condition.icon"></i>
-                </div>
-                <div class="day__temp-range">{{day.minT}}<sup>o</sup>/{{day.maxT}}<sup>o</sup></div>
+                </span>
+                <span class="day__temp-range">{{day.minT}}<sup>o</sup>/{{day.maxT}}<sup>o</sup></span>
               </a>
             </li>
-        <!--    <div class="widget__hoverEffect" v-bind:style="{left: hoverElement.pos + 'px'}"></div> !-->
           </ul>
         </div>
         <div class="widget__tabs">
           <div class="widget__tab"
                v-for="(day, i) in weather"
-               :class='currentTab == i + 1 ? "active" : ""'>
+               :key="i"
+               :class='currentTab === i + 1 ? "active" : ""'>
           <div class="total-description">
             <div class="avg-temp">{{ day.avgT}}<sup>o</sup></div>
             <div class="range-temp">
@@ -45,7 +43,7 @@
               <div class="row th">Ветер км/час</div>
               <div class="row th">Состояние</div>
             </div>
-            <div v-for="(time, j) in day.list" class="col">
+            <div v-for="(time, j) in day.list" :key="j" class="col">
               <div class="time row">
                 {{ time.dt_txt.split(" ")[1].split(':').slice(0, 2).join(':') }}
               </div>
@@ -59,85 +57,41 @@
               </div>
               <div class="description row">
                 {{ time.weather[0].description.slice(0, 1).toUpperCase() + time.weather[0].description.slice(1)}}
-                <i class="wi" :class='time.dt_txt.split(" ")[1].split(":")[0] > 3 && time.dt_txt.split(" ")[1].split(":")[0] < 19 ? iconsDay[time.weather[0].description] : iconsNight[time.weather[0].description]'></i>
+                <i class="wi" :class='time.dt_txt.split(" ")[1].split(":")[0] > 3 && time.dt_txt.split(" ")[1].split(":")[0] < 19 ? icons["iconsDay"][time.weather[0].description] : icons["iconsNight"][time.weather[0].description]'></i>
               </div>
             </div>
           </div>
          </div>
         </div>
       </div>
-      <div class="widget__map">
-      <mapLoader v-if="loadingMap" :loading="loadingMap"></mapLoader>
-        <iframe
-          v-show="!loadingMap"
-          width="450"
-          height="250"
-          frameborder="0" style="border:0"
-          :src="mapURL"
-          @load="loaded">
-        </iframe>
-      </div>
+      <Map :city="city" />
     </div>
   </div>
 </template>
 <script>
-import mapLoader from './mapLoader'
-
+import Map from './Map'
+import widgetLoader from './widgetLoader'
 export default {
   name: 'widget',
-  props: ['weather', 'mapURL', 'city', 'status'],
-  data () {
-    return {
-      currentTab: 1,
-      loadingMap: true,
-      hoverElement: {
-        'w': 0,
-        'pos': 0
-      },
-      iconsDay: {
-        'ясно':'wi-day-sunny',
-        'пасмурно': 'cloudy',
-        'легкий дождь': 'wi-day-showers',
-        'слегка облачно': 'wi-day-cloudy',
-        'дождь': 'wi-day-rain',
-        'облачно': ' cloudy',
-        'снег': 'wi-day-snow',
-        'молния': 'wi-day-sleet-storm'
-      },
-      iconsNight: {
-        'ясно':'wi-night-clear',
-        'пасмурно': 'cloudy',
-        'легкий дождь': 'wi-night-alt-sprinkle',
-        'слегка облачно': 'wi-night-alt-cloudy',
-        'дождь': 'wi-night-alt-rain',
-        'облачно': 'cloudy',
-        'снег': 'wi-night-alt-snow',
-        'молния': 'wi-night-alt-lightning'
-      }
+  props: {
+    currentTab: {
+      type: Number,
+      default: 1
+    },
+    city: String,
+    icons: Object,
+    weather: Array,
+    loading: Boolean,
+    error: {
+      default: null
     }
   },
   methods: {
-    changeTab(n, event) {
-      document.querySelector(`.widget__menu li:nth-child(${this.currentTab})`).classList.remove('active');
-      this.currentTab = n;
-      document.querySelector(`.widget__menu li:nth-child(${n})`).classList.add('active');
-      let target = event.target.nodeName == "A" ? event.target.parentNode : event.target.parentNode.parentNode;
-      this.hoverElement.pos = target.getBoundingClientRect().left - document.querySelector('.widget__menu li:first-child').getBoundingClientRect().left;
-      this.hoverElement.w = target.getBoundingClientRect().width;
-
-    },
-    loaded() {
-      this.loadingMap = false;
-    },
-    resize(){
-      this.hoverElement.pos = document.querySelector(`.widget__menu li:nth-child(${this.currentTab})`).getBoundingClientRect().left - document.querySelector('.widget__menu li:first-child').getBoundingClientRect().left;
-      this.hoverElement.w = document.querySelector(`.widget__menu li:nth-child(${this.currentTab})`).getBoundingClientRect().width;
+    changeTab (n) {
+      this.$emit('tabChanged', n)
     }
   },
-  components: {mapLoader},
-  created() {
-    window.addEventListener('resize', this.resize);
-  }
+  components: {Map, widgetLoader}
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -161,14 +115,6 @@ export default {
     100% {
       opacity: 1;
     }
-  }
-  .hoverElement {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 190px;width: 18%;
-    background: rgba(0,0,0,.5);
-    transition: all 1s cubic-bezier(0, 0.95, 0.64, 1.27);
   }
   .widget__weather {
     width: 60%;
@@ -201,12 +147,12 @@ export default {
     margin-left: 5px;
   }
   .widget__menu li.active {
-    background: transparent;
+    background: rgba(0,0,0,.5);
   }
   .widget__menu li:first-child {
     margin-left: 0;
   }
-  .widget__menu li > a {
+  .widget__menu li a {
     width: 100%;
     text-align: center;
     text-decoration: none;
@@ -218,8 +164,9 @@ export default {
     justify-content: space-around;
     flex-direction: column;
   }
-  .widget__menu li > a > div {
+  .widget__menu li span {
     margin: 10px 0;
+    display: inline-block;
   }
   .widget__menu .day__name {
     color: #fff;
@@ -240,19 +187,8 @@ export default {
   }
   .widget__tab.active {
     display: block;
-    animation: fadeAndRoll 1s ease-in-out;
     background: rgba(0,0,0,.5);
     padding: 6px 3px;
-  }
-  @keyframes fadeAndRoll {
-    0% {
-      opacity: 0;
-      transform: translateX(-25px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0);
-    }
   }
   .total-description {
     width: 240px;
@@ -417,7 +353,6 @@ export default {
 .wi-night-alt-cloudy:before {
   content: "\f086";
 }
-.
 .wi-night-alt-lightning:before {
   content: "\f025";
 }

@@ -27,24 +27,24 @@ router.get('/:cityName', function(req, res, next) {
     cursor = db.collection('weather').find({cityName: city}).nextObject(function(err, item) {
       if(item) {
         if((new Date().getFullYear() != new Date(item.modified).getFullYear() || new Date().getMonth() != new Date(item.modified).getMonth() || new Date().getDate() != new Date(item.modified).getDate()) ) {
-          console.log('from api update db');
           getDataFromApi(db, true);
         } else {
-          console.log('from db');
           item = JSON.parse(JSON.stringify(item));
           res.send(item.data);
         }
       } else {
-        console.log('from api insert in db');
         getDataFromApi(db);
       }
     });
   });
 
 function getDataFromApi(db, update) {
-  request(`http://api.openweathermap.org/data/2.5/forecast?q=${transliteration.transliterate(city)}&APPID=${key}&lang=ru&units=metric`, function (error, response, body) {
+  console.log('from api', `http://api.openweathermap.org/data/2.5/forecast?q="${city}"&APPID=${key}&lang=ru&units=metric`);
+  // ${transliteration.transliterate(city)}
+  request(`http://api.openweathermap.org/data/2.5/forecast?q=${city}&APPID=${key}&lang=ru&units=metric`, function (error, response, body) {
     body = JSON.parse(body);
-    if(body.cod != 200) res.send(404);
+    console.log(body);
+    if(body.cod != 200) res.status(404).send(body.message);
     else {
       body.list.forEach(item => {
         let date = item.dt_txt.split(" ")[0];

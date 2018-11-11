@@ -1,7 +1,7 @@
 <template>
   <div class="form-wrap" :class='isActiveWidget ? "active" : ""'>
     <div class="form">
-      <input type="text" autofocus @focus="isActivePlaceholder = true" @blur="isActivePlaceholder = false" v-model='searchStr' @keyup.enter="search">
+      <input type="text" ref="input" autofocus @focus="isActivePlaceholder = true" @blur="isActivePlaceholder = false" v-model='searchStr' @keyup.enter="search">
       <a href="" @click.prevent="search">Найти</a>
       <div class="form__placeholder"
            @click="focusForm"
@@ -15,7 +15,6 @@
   </div>
 </template>
 <script>
-
 export default {
   name: 'myForm',
   data () {
@@ -27,20 +26,20 @@ export default {
   },
   props: ['isActiveWidget'],
   methods: {
-    focusForm() {
-      document.querySelector('.form > input').focus();
+    focusForm () {
+      this.$refs['input'].focus()
     },
-    search(e) {
-      if(!this.searchStr.length) {
-        this.error = true;
-        return false;
+    search (e) {
+      if (!this.searchStr.length) {
+        this.error = true
+        return false
       }
-      if(this.searchStr == +this.searchStr) {
-        this.searchStr = '';
-        this.error = true;
-        return;
+      if (this.searchStr === +this.searchStr) {
+        this.searchStr = ''
+        this.error = true
+        return
       }
-      this.$emit('pressed', this.searchStr);
+      this.$emit('pressed', this.searchStr)
     }
   }
 }
@@ -55,13 +54,13 @@ export default {
   left: 50%;
   margin-top: -23px;
   margin-left: -490px;
-  transition: top .5s linear;
+  transition: top 0.5s linear;
 }
 .form-wrap.active {
   top: 60px;
   margin-top: 0;
 }
-.form{
+.form {
   width: 100%;
   height: 100%;
   position: relative;
@@ -79,18 +78,22 @@ export default {
   text-align: center;
   text-decoration: none;
   user-select: none;
-  background: rgb(212,75,56);
-  padding: .85em 1.5em;
+  background: rgb(212, 75, 56);
+  padding: 0.85em 1.5em;
   color: #fff;
   float: left;
 }
-.form > a:hover {background:  rgb(232,95,76);}
-.form > a:active {background:  rgb(152,15,0);}
+.form > a:hover {
+  background: rgb(232, 95, 76);
+}
+.form > a:active {
+  background: rgb(152, 15, 0);
+}
 .form > .form__placeholder {
   position: absolute;
   top: 33%;
   left: 1%;
-  transition: all .5s ease;
+  transition: all 0.5s ease;
   color: #999;
 }
 .form > .form__placeholder.active {
@@ -100,7 +103,7 @@ export default {
   transform: scale(0.7);
 }
 .form__placeholder.error {
-  animation: emptyString .1s linear alternate;
+  animation: emptyString 0.1s linear alternate;
   animation-iteration-count: 3;
   color: #ff0033;
 }
@@ -110,14 +113,13 @@ export default {
   }
   100% {
     transform: rotateZ(-2deg);
-
   }
 }
 @media screen and (max-width: 980px) {
   .form-wrap {
-  left: 2.5%;
-  width: 95%;
-  margin-left: 0;
+    left: 2.5%;
+    width: 95%;
+    margin-left: 0;
   }
 }
 </style>
